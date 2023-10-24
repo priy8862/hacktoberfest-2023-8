@@ -1,0 +1,66 @@
+You are given two strings s and t. Now your task is to print all longest common sub-sequences in lexicographical order.
+
+Example 1:
+
+Input: s = abaaa, t = baabaca
+Output: aaaa abaa baaa...
+
+
+
+
+
+
+
+def findLCS(s, t):
+    n, m = len(s), len(t)
+    
+    # Initialize a 2D array to store the length of LCS
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    
+    # Fill in the dp table
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if s[i - 1] == t[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    
+    return dp[n][m]
+
+def printAllLCS(s, t, i, j, currLCS, allLCS):
+    if i == 0 or j == 0:
+        allLCS.append(''.join(reversed(currLCS)))
+        return
+    
+    if s[i - 1] == t[j - 1]:
+        currLCS.append(s[i - 1])
+        printAllLCS(s, t, i - 1, j - 1, currLCS, allLCS)
+        currLCS.pop()
+    
+    if dp[i - 1][j] >= dp[i][j - 1]:
+        printAllLCS(s, t, i - 1, j, currLCS, allLCS)
+    
+    if dp[i][j - 1] >= dp[i - 1][j]:
+        printAllLCS(s, t, i, j - 1, currLCS, allLCS)
+
+def findLexicographicalLCS(s, t):
+    global dp
+    n, m = len(s), len(t)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    
+    # Calculate the length of the LCS
+    lcsLength = findLCS(s, t)
+    
+    allLCS = []
+    printAllLCS(s, t, n, m, [], allLCS)
+    
+    # Filter longest subsequences
+    longestLCS = [lcs for lcs in allLCS if len(lcs) == lcsLength]
+    
+    return sorted(longestLCS)
+
+# Example
+s = "abaaa"
+t = "baabaca"
+result = findLexicographicalLCS(s, t)
+print(" ".join(result))  # Output: "aaaa abaa baaa"
